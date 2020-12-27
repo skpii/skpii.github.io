@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通过构造函数改造多个选项卡实例</title>
+</head>
+<body>
+    <div class="tab1">
+        <button style="background: red">按钮一</button>
+        <button>按钮二</button>
+        <button>按钮三</button>
+        <p>内容一</p>
+        <p style="display: none">内容二</p>
+        <p style="display: none">内容三</p>
+    </div>
+    <div class="tab2">
+        <button style="background: red">按钮一</button>
+        <button>按钮二</button>
+        <button>按钮三</button>
+        <button>按钮四</button>
+        <p>内容一</p>
+        <p style="display: none">内容二</p>
+        <p style="display: none">内容三</p>
+        <p style="display: none">内容四</p>
+    </div>
+    <button class="nextPre">点击我下一页</button>
+    <button class="autoPlay">点击我第二个选项卡自动轮播</button>
+    <p>未完成问题 选项卡二自动轮播不能暂停</p>
+</body>
+<script>
+    function Tab(btns,ps){
+        this.btns = btns;
+        this.ps = ps;
+        this.btnFor();
+    }
+    Tab.prototype.btnFor = function (){
+        this.btns.forEach((value,key) => {
+            value.onclick = () => {
+                this.psFor(key);
+            }
+        });
+    }
+    Tab.prototype.psFor = function (key) {
+        this.ps.forEach((v,k) => {
+            if (key == k) {
+                this.btns[k].style.background = "red";
+                this.ps[k].style.display = "block";
+            } else {
+                this.btns[k].style.background = "";
+                this.ps[k].style.display = "none";
+            }
+        })
+    }
+    let btns = document.querySelectorAll(".tab1 button");
+    let ps = document.querySelectorAll(".tab1 p");
+    let tab1 = new Tab(btns,ps);
+    let num = 0;
+    document.querySelector(".nextPre").onclick = function () {
+        num++;
+        num = num > tab1.btns.length - 1 ? 0 : num;
+        tab1.psFor(num);
+    }
+
+    let btns2 = document.querySelectorAll(".tab2 button");
+    let ps2 = document.querySelectorAll(".tab2 p");
+    let tab2 =new Tab(btns2, ps2);
+    let num2 = 0;
+    document.querySelector(".autoPlay").onclick = function () {
+        let num2 = 0;
+        setInterval(() => {
+            num2++;
+            num2 = num2 > tab2.btns.length - 1 ? 0 : num2;
+            tab2.psFor(num2);
+        }, 1000);
+    }
+    // 未完成问题 选项卡二自动轮播不能暂停
+</script>
+</html>
