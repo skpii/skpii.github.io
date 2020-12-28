@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拖拽效果</title>
+    <style>
+        .mydiv1 {
+            width: 100px;
+            height: 100px;
+            background: red;
+            position: absolute;
+        }
+
+        .mydiv2 {
+            width: 100px;
+            height: 100px;
+            background: blue;
+            position: absolute;
+            left: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mydiv1"></div>
+    <div class="mydiv2"></div>
+</body>
+<script>
+    //面向对象
+    function Drag(ele){
+        this.ele = ele;
+        this.downFn();
+    }
+    Drag.prototype.downFn = function () {
+        this.ele.onmousedown = e => {
+            let ev  = e || window.event;
+            let x = ev.clientX - this.ele.offsetLeft;
+            let y = ev.clientY - this.ele.offsetTop;
+            this.moveFn(x, y);
+            this.upFn();
+        }
+    }
+    Drag.prototype.moveFn = function (x, y) {
+        this.ele.onmousemove = e => {
+            let ev = e || window.event;
+            let xx = ev.clientX;
+            let yy = ev.clientY;
+            this.setStyle(xx - x, yy - y);
+        }
+    }
+    Drag.prototype.setStyle = function (leftNum, topNum) {
+        this.ele.style.left = leftNum + "px";
+        this.ele.style.top = topNum + "px";
+    }
+    Drag.prototype.upFn = function () {
+        this.ele.onmouseup = () => {
+            this.ele.onmousemove = "";
+        }
+    }
+    let mydiv1 = document.querySelector(".mydiv1");
+    let drag1 = new Drag(mydiv1);
+
+    function LimitDrag(ele) {
+        Drag.call(this, ele);
+    }
+    //组合继承
+    // let Link = function () { };
+    // Link.prototype = Drag.prototype;
+    // LimitDrag.prototype = new Link();
+    // LimitDrag.prototype.constructor = LimitDrag;
+
+    // 深拷贝继承
+    LimitDrag.prototype = deepCopy(Drag.prototype)
+    LimitDrag.prototype.constructor = LimitDrag;
+
+    // 递归深拷贝
+    function deepCopy(obj) {
+        let newObj = Array.isArray(obj) ? [] : {};
+        for (let i in obj) {
+            if (obj.hasOwnProperty(i)) {
+                if (typeof obj[i] === "object") {
+                    if (obj[i] === null) {
+                        newObj[i] = null;
+                    } else {
+                        newObj[i] = deepCopy(obj[i]);
+                    }
+                } else {
+                    newObj[i] = obj[i];
+                }
+            }
+        }
+        return newObj;
+    }
+
+    LimitDrag.prototype.setStyle = function (leftNum, topNum) {
+        leftNum = leftNum < 0 ? 0 : leftNum;
+        topNum = topNum < 0 ? 0 : topNum;
+        this.ele.style.left = leftNum + "px";
+        this.ele.style.top = topNum + "px";
+    }
+
+
+
+
+
+
+
+
+
+    let mydiv2 = document.querySelector(".mydiv2");
+    let drag2 = new LimitDrag(mydiv2);
+
+</script>
+</html>
